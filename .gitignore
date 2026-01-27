@@ -1,0 +1,14 @@
+env.py
+blog/fixtures
+.venv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Dumped the original local sqlite DB folder here just in case it's needed in future for testing
+uncommitted/
+
+# Local DB sqlite3 file
+db.sqlite3

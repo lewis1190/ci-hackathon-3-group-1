@@ -6,43 +6,36 @@
 <!-- Todo Lists Section -->
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">My Todo Lists</h2>
-    <a href="#" class="btn btn-primary">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createListModal">
         Create New List
-    </a>
+    </button>
 </div>
 
+{% if todo_lists %}
 <div class="row g-3 mb-5">
+    {% for list in todo_lists %}
     <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Work Tasks</h5>
-                <p class="card-text text-muted">5 tasks</p>
+        <a href="?list_id={{ list.id }}" style="text-decoration: none;">
+            <div class="card shadow-sm {% if current_list.id == list.id %}border-primary{% endif %}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ list.title }}</h5>
+                    <p class="card-text text-muted">{{ list.todoitem_set.count }} tasks</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
-
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Groceries</h5>
-                <p class="card-text text-muted">3 tasks</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Trip Planning</h5>
-                <p class="card-text text-muted">7 tasks</p>
-            </div>
-        </div>
-    </div>
+    {% endfor %}
 </div>
+{% else %}
+<div class="alert alert-info" role="alert">
+    No todo lists yet. Create one to get started!
+</div>
+{% endif %}
 
 <!-- Selected Todo List -->
+{% if current_list %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="mb-0">Work Tasks</h3>
+    <h3 class="mb-0">{{ current_list.title }}</h3>
     <div>
         <button class="btn btn-outline-secondary btn-sm me-2">
             Rename List
@@ -52,76 +45,181 @@
         </button>
     </div>
 </div>
+{% endif %}
 
 <!-- Add Task -->
+{% if current_list %}
 <div class="card mb-4">
     <div class="card-body">
-        <form class="d-flex gap-2">
+        <form method="POST" action="{% url 'add_todo_item' %}" class="d-flex gap-2">
+            {% csrf_token %}
             <input
               type="text"
               class="form-control"
+              name="item_text"
               placeholder="Task name..."
+              required
             >
-            <button class="btn btn-primary">
+            <input type="hidden" name="list_id" value="{{ current_list.id }}">
+            <button type="submit" class="btn btn-primary">
                 Add Task
             </button>
         </form>
     </div>
 </div>
+{% endif %}
 
 <!-- Tasks -->
+{% if completed_items %}
 <div class="card mb-4">
     <div class="card-header fw-bold">Complete</div>
     <ul class="list-group list-group-flush">
+        {% for item in completed_items %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div>
-                <input class="form-check-input me-2" type="checkbox" checked>
+                <form method="POST" action="{% url 'toggle_todo_item' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input type="hidden" name="list_id" value="{{ current_list.id }}">
+                    <button type="submit" class="btn btn-link p-0" style="border: none; background: none; text-decoration: none;">
+                        <input class="form-check-input me-2" type="checkbox" checked>
+                    </button>
+                </form>
                 <span class="text-decoration-line-through">
-                    Complete report
+                    {{ item.item_text }}
                 </span>
                 <span class="badge bg-success ms-2">Completed</span>
             </div>
             <div>
-                <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
+                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editItemModal" data-item-id="{{ item.id }}" data-item-text="{{ item.item_text }}">Edit</button>
+                <form method="POST" action="{% url 'delete_todo_item' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input type="hidden" name="list_id" value="{{ current_list.id }}">
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
             </div>
         </li>
+        {% endfor %}
     </ul>
 </div>
+{% endif %}
 
+{% if incomplete_items %}
 <div class="card mb-4">
     <div class="card-header fw-bold">Incomplete</div>
     <ul class="list-group list-group-flush">
+        {% for item in incomplete_items %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div>
-                <input class="form-check-input me-2" type="checkbox">
-                Team meeting at 3 PM
+                <form method="POST" action="{% url 'toggle_todo_item' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input type="hidden" name="list_id" value="{{ current_list.id }}">
+                    <button type="submit" class="btn btn-link p-0" style="border: none; background: none; text-decoration: none;">
+                        <input class="form-check-input me-2" type="checkbox">
+                    </button>
+                </form>
+                {{ item.item_text }}
             </div>
             <div>
-                <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
-                <button class="btn btn-sm btn-success me-1">Mark Complete</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
+                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editItemModal" data-item-id="{{ item.id }}" data-item-text="{{ item.item_text }}">Edit</button>
+                <form method="POST" action="{% url 'toggle_todo_item' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input type="hidden" name="list_id" value="{{ current_list.id }}">
+                    <button type="submit" class="btn btn-sm btn-success me-1">Mark Complete</button>
+                </form>
+                <form method="POST" action="{% url 'delete_todo_item' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input type="hidden" name="list_id" value="{{ current_list.id }}">
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
             </div>
         </li>
-
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-                <input class="form-check-input me-2" type="checkbox">
-                Fix bug in code
-            </div>
-            <div>
-                <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
-                <button class="btn btn-sm btn-success me-1">Mark Complete</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
-            </div>
-        </li>
+        {% endfor %}
     </ul>
 </div>
+{% endif %}
+
+{% if not completed_items and not incomplete_items and current_list %}
+<div class="alert alert-info" role="alert">
+    No tasks in this list yet. Create one to get started!
+</div>
+{% endif %}
 
 <div class="text-center">
     <button class="btn btn-outline-secondary">
         Clear Completed Tasks
     </button>
 </div>
+
+<!-- Create List Modal -->
+<div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createListModalLabel">Create New Todo List</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'create_todo_list' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="listTitle" class="form-label">List Title</label>
+                        <input type="text" class="form-control" id="listTitle" name="title" placeholder="Enter list title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="listDescription" class="form-label">Description (optional)</label>
+                        <textarea class="form-control" id="listDescription" name="description" rows="3" placeholder="Enter list description"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create List</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Item Modal -->
+<div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editItemModalLabel">Edit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'edit_todo_item' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="itemText" class="form-label">Task Description</label>
+                        <input type="text" class="form-control" id="itemText" name="item_text" placeholder="Enter task description" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="item_id" id="editItemId">
+                    <input type="hidden" name="list_id" value="{{ current_list.id }}">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('editItemModal').addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const itemId = button.getAttribute('data-item-id');
+    const itemText = button.getAttribute('data-item-text');
+    
+    document.getElementById('editItemId').value = itemId;
+    document.getElementById('itemText').value = itemText;
+});
+</script>
 
 {% endblock %}

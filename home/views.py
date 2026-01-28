@@ -1,7 +1,132 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+from django.http import HttpResponseForbidden
+from django.urls import reverse
+from .models import TodoList, TodoItem
 
-# Create your views here.
 
-
+@login_required
 def home(request):
-    return render(request, 'home/home.html')
+    todo_lists = TodoList.objects.filter(user=request.user).prefetch_related('todoitem_set')
+    selected_list = request.GET.get('list_id')
+    
+    if selected_list:
+        try:
+            current_list = TodoList.objects.get(id=selected_list, user=request.user)
+            items = current_list.todoitem_set.all()
+        except TodoList.DoesNotExist:
+            current_list = todo_lists.first()
+            items = current_list.todoitem_set.all() if current_list else TodoItem.objects.none()
+    else:
+        current_list = todo_lists.first()
+        items = current_list.todoitem_set.all() if current_list else TodoItem.objects.none()
+    
+    completed_items = items.filter(completed=True)
+    incomplete_items = items.filter(completed=False)
+    
+    context = {
+        'todo_lists': todo_lists,
+        'current_list': current_list,
+        'completed_items': completed_items,
+        'incomplete_items': incomplete_items,
+    }
+    
+    return render(request, 'home/home.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def create_todo_list(request):
+    title = request.POST.get('title', '').strip()
+    description = request.POST.get('description', '').strip()
+    
+    if title:
+        TodoList.objects.create(
+            title=title,
+            description=description if description else None,
+            user=request.user
+        )
+    
+    return redirect('home')
+
+
+@login_required
+@require_http_methods(["POST"])
+def add_todo_item(request):
+    list_id = request.POST.get('list_id')
+    item_text = request.POST.get('item_text', '').strip()
+    
+    if list_id and item_text:
+        todo_list = get_object_or_404(TodoList, id=list_id, user=request.user)
+        TodoItem.objects.create(
+            todo_list=todo_list,
+            item_text=item_text
+        )
+    
+    if list_id:
+        return redirect(reverse('home') + f'?list_id={list_id}')
+    return redirect('home')
+
+
+@login_required
+@require_http_methods(["POST"])
+def edit_todo_item(request):
+    item_id = request.POST.get('item_id')
+    item_text = request.POST.get('item_text', '').strip()
+    list_id = request.POST.get('list_id')
+    
+    if item_id and item_text:
+        todo_item = get_object_or_404(TodoItem, id=item_id)
+        
+        # Check if user owns this item
+        if todo_item.todo_list.user != request.user:
+            return HttpResponseForbidden()
+        
+        todo_item.item_text = item_text
+        todo_item.save()
+    
+    if list_id:
+        return redirect(reverse('home') + f'?list_id={list_id}')
+    return redirect('home')
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_todo_item(request):
+    item_id = request.POST.get('item_id')
+    list_id = request.POST.get('list_id')
+    
+    if item_id:
+        todo_item = get_object_or_404(TodoItem, id=item_id)
+        
+        # Check if user owns this item
+        if todo_item.todo_list.user != request.user:
+            return HttpResponseForbidden()
+        
+        todo_item.delete()
+    
+    if list_id:
+        return redirect(reverse('home') + f'?list_id={list_id}')
+    return redirect('home')
+
+
+@login_required
+@require_http_methods(["POST"])
+def toggle_todo_item(request):
+    item_id = request.POST.get('item_id')
+    list_id = request.POST.get('list_id')
+    
+    if item_id:
+        todo_item = get_object_or_404(TodoItem, id=item_id)
+        
+        # Check if user owns this item
+        if todo_item.todo_list.user != request.user:
+            return HttpResponseForbidden()
+        
+        todo_item.completed = not todo_item.completed
+        todo_item.save()
+    
+    if list_id:
+        return redirect(reverse('home') + f'?list_id={list_id}')
+    return redirect('home')

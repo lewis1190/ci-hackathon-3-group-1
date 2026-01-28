@@ -169,6 +169,10 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
+# Authentication & Login/Logout Redirects
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 

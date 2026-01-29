@@ -152,6 +152,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+X_FRAME_OPTIONS = (
+    'ALLOW-FROM https://fireship.dev/*'
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

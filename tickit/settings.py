@@ -48,7 +48,7 @@ DEBUG = True if os.path.isfile('env.py') and os.environ.get(
 
 ALLOWED_HOSTS = [
     '.herokuapp.com',
-    'https://fireship.dev'
+    'https://fireship.dev',
     '127.0.0.1'
 ]
 

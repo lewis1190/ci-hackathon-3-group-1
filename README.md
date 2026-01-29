@@ -7,6 +7,18 @@ This project is built for educational purposes to demonstrate Django CRUD functi
 
 ## Features
 
+- User Authentication: Sign up, log in, and log out functionality using `django-allauth`.
+
+- Todo List Management: Create, read, update, and delete TODO lists.
+
+- Task Management: Add, edit, mark as complete/incomplete, and delete tasks within each TODO list.
+
+- Responsive Design: Mobile-friendly interface using Bootstrap 5.
+
+- Custom Login UI to separate the login experience from the default allauth templates.
+
+## Screenshots
+
 ## Installation & Setup Instructions
 
 Follow these steps to set up and run this Django project on a new machine.
@@ -104,8 +116,6 @@ The application uses `env.py` for development configuration. The following can b
 ## Troubleshooting
 
 TODO
-
-
 
 ## User Stories
 

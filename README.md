@@ -12,6 +12,33 @@ This project is built for educational purposes to demonstrate Django CRUD functi
 -   [Deployed Application](https://ci-tickit-3981b641748d.herokuapp.com/)
 -   [Project Presentation](https://docs.google.com/presentation/d/1d4toofZC3AVs5WGB6zzu-sgqvpaVyhCZ7lY1ciGarYk/edit?slide=id.g2b6f9610e6e_0_93#slide=id.g2b6f9610e6e_0_93)
 
+## Table of Contents
+
+- [Features](#features)
+- [Future Enhancements](#future-enhancements)
+- [Screenshots](#screenshots)
+- [Planning](#planning)
+  -   [Project Management and Methodology](#project-management-and-methodology)
+  -   [User Stories](#user-stories)
+  -   [Wireframes](#wireframes)
+- [Testing](#testing)
+  -   [Home View Tests](#home-view-tests)
+- [How We Used AI in This Project](#how-we-used-ai-in-this-project)
+  -   [Scoping and Discovery of User Stories](#scoping-and-discovery-of-user-stories)
+  -   [Mockups and Wireframes](#mockups-and-wireframes)
+  -   [Learning Unfamiliar Code and Functions](#learning-unfamiliar-code-and-functions)
+  -   [Debugging Unit Tests](#debugging-unit-tests)
+- [Installation & Setup Instructions](#installation--setup-instructions)
+  -   [Prerequisites](#prerequisites)
+  -   [Step 1: Clone the Repository](#step-1-clone-the-repository)
+  -   [Step 2: Create a Virtual Environment](#step-2-create-a-virtual-environment)
+  -   [Step 3: Install Dependencies](#step-3-install-dependencies)
+  -   [Step 4: Create Environment Configuration](#step-4-create-environment-configuration)
+  -   [Step 5: Run the Development Server](#step-5-run-the-development-server)
+- [Project Structure](#project-structure)
+- [Key Technologies](#key-technologies)
+- [Environment Variables](#environment-variables)
+
 ## Features
 
 - User Authentication: Sign up, log in, and log out functionality using `django-allauth`.
@@ -174,8 +201,9 @@ We used Balsamiq web to create wireframes for the main pages of the application.
 
 To test this application, we focused on automated unit tests for the views. Below is a full table of all unit tests currently running, and their status as of the latest production deploy on 29/01/2026.
 
-### home/test_views.py
+### Home View Tests
 
+`home/test_views.py`
 | Test Function Name | Status |
 | ----------- | -------- |
 | test_home_view_requires_login | PASS |

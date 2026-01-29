@@ -178,10 +178,10 @@
             <!-- Email/Username Field -->
             <div class="form-group">
                 <label for="id_login">Email or Username</label>
-                <input 
-                    type="text" 
-                    id="id_login" 
-                    name="login" 
+                <input
+                    type="text"
+                    id="id_login"
+                    name="login"
                     placeholder="Enter your email or username"
                     required
                     {% if form.login.value %}value="{{ form.login.value }}"{% endif %}
@@ -198,10 +198,10 @@
             <!-- Password Field -->
             <div class="form-group">
                 <label for="id_password">Password</label>
-                <input 
-                    type="password" 
-                    id="id_password" 
-                    name="password" 
+                <input
+                    type="password"
+                    id="id_password"
+                    name="password"
                     placeholder="Enter your password"
                     required
                 >
@@ -229,11 +229,8 @@
 
         <div class="login-footer">
             <p>
-                Don't have an account? 
+                Don't have an account?
                 <a href="{% url 'account_signup' %}">Sign up here</a>
-            </p>
-            <p>
-                <a href="{% url 'account_reset_password' %}">Forgot your password?</a>
             </p>
         </div>
     </div>

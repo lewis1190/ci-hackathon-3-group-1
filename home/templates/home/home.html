@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}My Todo Lists{% endblock %}
 
 {% block content %}
@@ -53,13 +54,7 @@
     <div class="card-body">
         <form method="POST" action="{% url 'add_todo_item' %}" class="d-flex gap-2">
             {% csrf_token %}
-            <input
-              type="text"
-              class="form-control"
-              name="item_text"
-              placeholder="Task name..."
-              required
-            >
+            <input type="text" class="form-control" name="item_text" placeholder="Task name..." required>
             <input type="hidden" name="list_id" value="{{ current_list.id }}">
             <button type="submit" class="btn btn-primary">
                 Add Task
@@ -75,13 +70,15 @@
     <div class="card-header fw-bold">Complete</div>
     <ul class="list-group list-group-flush">
         {% for item in completed_items %}
-        <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+        <li
+            class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
             <div style="min-width: 0;">
                 <form method="POST" action="{% url 'toggle_todo_item' %}" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="item_id" value="{{ item.id }}">
                     <input type="hidden" name="list_id" value="{{ current_list.id }}">
-                    <button type="submit" class="btn btn-link p-0" style="border: none; background: none; text-decoration: none;">
+                    <button type="submit" class="btn btn-link p-0"
+                        style="border: none; background: none; text-decoration: none;">
                         <input class="form-check-input me-2" type="checkbox" checked>
                     </button>
                 </form>
@@ -91,7 +88,9 @@
                 <span class="badge bg-success ms-2">Completed</span>
             </div>
             <div class="mt-2 mt-md-0 d-flex justify-content-end gap-1 ms-md-3 align-self-end" style="flex-shrink: 0;">
-                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editItemModal" data-item-id="{{ item.id }}" data-item-text="{{ item.item_text }}">Edit</button>
+                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal"
+                    data-bs-target="#editItemModal" data-item-id="{{ item.id }}"
+                    data-item-text="{{ item.item_text }}">Edit</button>
                 <form method="POST" action="{% url 'delete_todo_item' %}" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="item_id" value="{{ item.id }}">
@@ -110,20 +109,24 @@
     <div class="card-header fw-bold">Incomplete</div>
     <ul class="list-group list-group-flush">
         {% for item in incomplete_items %}
-        <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+        <li
+            class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
             <div style="min-width: 0;">
                 <form method="POST" action="{% url 'toggle_todo_item' %}" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="item_id" value="{{ item.id }}">
                     <input type="hidden" name="list_id" value="{{ current_list.id }}">
-                    <button type="submit" class="btn btn-link p-0" style="border: none; background: none; text-decoration: none;">
+                    <button type="submit" class="btn btn-link p-0"
+                        style="border: none; background: none; text-decoration: none;">
                         <input class="form-check-input me-2" type="checkbox">
                     </button>
                 </form>
                 {{ item.item_text }}
             </div>
             <div class="mt-2 mt-md-0 d-flex justify-content-end gap-1 ms-md-3 align-self-end" style="flex-shrink: 0;">
-                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editItemModal" data-item-id="{{ item.id }}" data-item-text="{{ item.item_text }}">Edit</button>
+                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal"
+                    data-bs-target="#editItemModal" data-item-id="{{ item.id }}"
+                    data-item-text="{{ item.item_text }}">Edit</button>
                 <form method="POST" action="{% url 'toggle_todo_item' %}" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="item_id" value="{{ item.id }}">
@@ -161,164 +164,12 @@
 </div>
 {% endif %}
 
-<!-- Create List Modal -->
-<div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createListModalLabel">Create New Todo List</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="POST" action="{% url 'create_todo_list' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="listTitle" class="form-label">List Title</label>
-                        <input type="text" class="form-control" id="listTitle" name="title" placeholder="Enter list title" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="listDescription" class="form-label">Description (optional)</label>
-                        <textarea class="form-control" id="listDescription" name="description" rows="3" placeholder="Enter list description"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create List</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+{% block bootstrap_modals %}
+{% include "home/bootstrap_modals.html" %}
+{% endblock bootstrap_modals %}
 
-<!-- Edit Item Modal -->
-<div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editItemModalLabel">Edit Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="POST" action="{% url 'edit_todo_item' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="itemText" class="form-label">Task Description</label>
-                        <input type="text" class="form-control" id="itemText" name="item_text" placeholder="Enter task description" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="item_id" id="editItemId">
-                    <input type="hidden" name="list_id" value="{{ current_list.id }}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Rename List Modal -->
-<div class="modal fade" id="renameListModal" tabindex="-1" aria-labelledby="renameListModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="renameListModalLabel">Rename Todo List</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="POST" action="{% url 'rename_todo_list' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="listTitleRename" class="form-label">List Title</label>
-                        <input type="text" class="form-control" id="listTitleRename" name="title" placeholder="Enter new title" value="{{ current_list.title }}" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="list_id" value="{{ current_list.id }}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Rename</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Delete List Modal -->
-<div class="modal fade" id="deleteListModal" tabindex="-1" aria-labelledby="deleteListModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteListModalLabel">Delete Todo List</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete "{{ current_list.title }}"? This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <form method="POST" action="{% url 'delete_todo_list' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="list_id" value="{{ current_list.id }}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-document.getElementById('editItemModal').addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget;
-    const itemId = button.getAttribute('data-item-id');
-    const itemText = button.getAttribute('data-item-text');
-    
-    document.getElementById('editItemId').value = itemId;
-    document.getElementById('itemText').value = itemText;
-});
-
-// Prevent checkbox default behavior and submit form instead
-document.querySelectorAll('button[type="submit"] .form-check-input').forEach(checkbox => {
-    checkbox.addEventListener('click', function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.disabled = true;
-        this.closest('button').disabled = true;
-        this.closest('button').closest('form').submit();
-    });
-});
-
-// Disable buttons on form submit to prevent double-requests
-const formsToProtect = [
-    '/toggle-item/',      // Mark Complete / Toggle
-    '/delete-item/',      // Delete task
-    '/delete-list/',      // Delete list
-    '/clear-completed/'   // Clear Completed Tasks
-];
-
-formsToProtect.forEach(formAction => {
-    document.querySelectorAll(`form[action*="${formAction}"]`).forEach(form => {
-        form.addEventListener('submit', function(event) {
-            const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.style.opacity = '0.6';
-                submitBtn.style.cursor = 'not-allowed';
-            }
-            
-            // For task-related actions, disable all buttons in the task item
-            if (formAction === '/toggle-item/' || formAction === '/delete-item/') {
-                const taskItem = this.closest('li');
-                if (taskItem) {
-                    taskItem.querySelectorAll('button').forEach(btn => {
-                        btn.disabled = true;
-                        btn.style.opacity = '0.6';
-                        btn.style.cursor = 'not-allowed';
-                    });
-                }
-            }
-        });
-    });
-});
-</script>
+{% block scripts %}
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
 
 {% endblock %}

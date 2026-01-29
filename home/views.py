@@ -8,23 +8,22 @@ from .models import TodoList, TodoItem
 
 @login_required
 def home(request):
-    todo_lists = TodoList.objects.filter(
-        user=request.user).prefetch_related('todoitem_set')
+    todo_lists = TodoList.objects.filter(user=request.user)
     selected_list = request.GET.get('list_id')
 
     if selected_list:
         try:
             current_list = TodoList.objects.get(
                 id=selected_list, user=request.user)
-            items = current_list.todoitem_set.all()
         except TodoList.DoesNotExist:
             current_list = todo_lists.first()
-            items = current_list.todoitem_set.all() if current_list else \
-                TodoItem.objects.none()
     else:
         current_list = todo_lists.first()
-        items = current_list.todoitem_set.all() if current_list else \
-            TodoItem.objects.none()
+
+    if current_list:
+        items = TodoItem.objects.filter(todo_list=current_list)
+    else:
+        items = TodoItem.objects.none()
 
     completed_items = items.filter(completed=True)
     incomplete_items = items.filter(completed=False)
